@@ -1,0 +1,187 @@
+---
+title: "Self-reported general health and the BRFSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+```
+
+```{r load-data}
+load("brfss2013.RData")
+```
+
+## Part 1: Data
+
+### How the observations in the sample are collected
+The BRFSS data is collected by phone (both land line and
+cellular). The BRFSS has a standard protocol for collecting the data,
+including quality controls such as:
+
+* Questions must be asked without modification
+* Interviewers are randomly monitored to ensure compliance
+* The idea of "household" is well-defined by the BRFSS, including  parameters like having a separate entrance and number of days occupied  (to exclude vacation rentals, for example)
+
+The sampling strategies (for there's more than one) are pretty
+robust. You can first break down sampling broadly into *landline* and
+*cellular*.
+
+* Landline uses a form of stratified sampling called "disproportionate
+  stratified sampling" (DSS):
+
+> DDS draws telephone numbers from two strata (lists) that are based on the presumed density of known telephone household numbers. In this design, telephone numbers are classified into strata that are either high density ( listed 1+ block telephone numbers) or medium density ( not listed 1+ block telephone numbers) to yield residential telephone numbers. Telephone numbers in the high density stratum are sampled at the highest rate.
+
+* For each household contacted via landline, one adult is randomly selected from the household.
+* Cellular sampling is randomly generated from confirmed area code and prefix combinations.
+* Each cellular number has an equal chance of being selected.
+
+The BRFSS has a goal of at least 4,000 respondents per state. A strategy of daytime calls (20%) and evening/weekend calls (80%), repeated call attempts, and follow-up calls to verify answers help ensure a reliable data set.
+
+It is worth noting that, while the questions in the "main" sections of
+the survey must be asked by all states conducting the survey, many
+"optional" sections are not, so one must take care when making
+inferences between variables. For example, the variable "qlhlth2: How
+Many Days Full Of Energy In Past 30 Days," while a compelling
+question, has only 465 responses out of the 491,775 total responses.
+
+```{r}
+# Total number of respondents in BRFSS2013
+dim(brfss2013)[1]
+# Total number of responses for the question "How Many Days Full Of Energy In Past 30 Days"
+sum(!is.na(brfss2013$qlhlth2))
+```
+
+### Scope of inference
+Data from the BRFSS allow us to draw *correlations* between two or
+more variables, but do not allow us to infer *causality* between any
+two or more variables. This is because the BRFSS is a *survey* and not a *controlled experiment*.
+
+### The interesting issue in this data analysis
+
+The BRFSS asks the question, "Would you say that in general your health is..." with choices ranging from "Excellent" to "Poor." This kind of question is problematic because the answer is "self reported." Respondents rate their general health as "Excellent" or "Fair" based on their subjective experience.
+
+From [Wikipedia](https://en.wikipedia.org/wiki/Self-report_study):
+
+> Self-report studies have validity problems. Patients may exaggerate symptoms in order to make their situation seem worse, or they may under-report the severity or frequency of symptoms in order to minimize their problems. Patients might also simply be mistaken or misremember the material covered by the survey.
+
+The research questions in this analysis start with the answer given for "Would you say that in general your health is...?" and look for correlations with other variables.
+
+## Part 2: Research questions
+
+**Research question 1:**
+For observations (respondents) who self-reported their general health "Excellent", "Very Good," "Poor," etc. does their answer correlation with the amount of sleep they reported? For example, do respondents who get more sleep tend to view themselves as generally healthier?
+
+In the popular literature the amount of sleep one gets has been
+associated with a weakened immune system, chronic fatigue, and other ailments. We are
+curious if the observations correlate to this belief.
+
+The National Sleep Foundation [considers 7+ hours per night for adults over 18](https://sleepfoundation.org/press-release/national-sleep-foundation-recommends-new-sleep-times) to be an adequate amount of sleep. We will explore the data based on their recommendation.
+
+**Research question 2:**
+For respondents who self-reported "Excellent" or "Poor,"  did vegetable, fruit, and bean consumption differ?
+
+The data set includes questions about how many times in the past 30 days respondents consumed fruits, beans, vegetables, and other healthy foods. Is there any difference in the response of those in "Excellent" health versus those in "Poor" health, when taking all of those solid foods together?
+
+**Research question 3:**
+Obesity and self-reporting. Does the respondent's answer correlate to obesity and exercise? The BRFSS computes a variable for us: the BMI, or Body Mass Index. Do people rated by the BRFSS as "Obese" consider themselves healthy? If they exercised in the past 30 days, does that appear to influence their answer?
+
+## Part 3: Exploratory data analysis
+
+**Research question 1:**
+For observations (respondents) who self-reported their general health “Excellent”, “Very Good,” “Poor,” etc. does their answer correlation with the amount of sleep they reported? For example, do respondents who get more sleep tend to view themselves as generally healthier?
+```{r}
+# Filter out N/A for both genhlth and sleptim1
+sleeptime <- brfss2013 %>% select(genhlth, sleptim1) %>% filter(!is.na(genhlth)) %>% filter(!is.na(sleptim1))
+# If the respondent reported less than seven hours per day of sleep, consider it "inadequate"
+sleeptime <- sleeptime %>% mutate(enoughsleep = ifelse(sleptim1 <= 7, "Inadequate", "Adequate"))
+# Summarize the counts
+ggplot(data = sleeptime, aes(x = genhlth, fill = enoughsleep)) + 
+  geom_bar() +
+  labs(title = "Reported General Health and Adequate Sleep") +
+  xlab("General Health") +
+  ylab("Number of Respondents") +
+#  labs(enoughsleep = "Amount Sleep")
+  guides(fill = guide_legend(reverse=TRUE)) +
+  guides(fill = guide_legend(title=NULL))
+```
+
+Surprisingly, the majority of respondents for each answer to the general health question do not get adequate sleep. At least by the appearance of this graph; we should look at the interquartile range and the median to get a better feel.
+
+```{r}
+ggplot(sleeptime, aes(x = "", y = sleptim1)) + geom_boxplot()
+```
+
+The mean and the median hours of sleep reported both hover right around 7 hours, so roughly half of respondents, regardless of their general health answer ("Excellent," "Fair," etc). The amount of reported sleep does not appear to correlate with the respondent's self-reported general health. There appear to be numerous outliers in the first quartile, which would explain why the preceding bar chart may be misleading by showing more people getting less sleep.
+
+
+**Research question 2:**
+For observations (respondents) who self-reported "Excellent" or "Poor,"  did vegetable, fruit and bean consumption differ?
+
+The BRSFF data set asks how many times respondents consumed various healthy foods:
+* How Many Times Did You Eat Fruit?
+* How Many Times Did You Eat Beans Or Lentils?
+* How Many Times Did You Eat Dark Green Vegetables?
+* How Many Times Did You Eat Orange-Colored Vegetables?
+* How Many Times Did You Eat Other Vegetables?
+
+First, let's combine the five categories here. We are going to look at solid foods and omit fruit juices.
+
+```{r}
+fruitsandveggies <- brfss2013 %>% select(genhlth, fruit1, fvbeans, fvgreen, fvorang, vegetab1)
+fruitsandveggies <- fruitsandveggies %>% mutate(yesfbv = fruit1 + fvbeans + fvgreen + fvorang + vegetab1) %>% na.omit()
+```
+
+Next, we'll look at histograms for those respondents who self-reported general health as "Excellent" versus those that reported their general health as "Poor":
+
+```{r}
+mostexcellent <- fruitsandveggies %>% filter(genhlth == "Excellent")
+ggplot(data = mostexcellent, aes(x = yesfbv)) + geom_histogram(binwidth = 100) + labs(title="Fruit and Vegetable Consumption, Excellent Health") + xlab("Fruit, Vegetalble, Bean servings past 30 days")
+```
+
+```{r}
+mostpoor <- fruitsandveggies %>% filter(genhlth == "Poor")
+ggplot(data = mostpoor, aes(x = yesfbv)) + geom_histogram(binwidth = 100) + 
+  labs(title="Fruit and Vegetable Consumption, Poor Health") + xlab("Fruit, Vegetable, Bean servings past 30 days")
+```
+
+```{r}
+fruitsandveggies %>% filter(genhlth == "Excellent" | genhlth == "Poor") %>% group_by(genhlth) %>% summarise(count = n())
+```
+
+**Research question 3:**
+
+Obesity and self-reporting. Does the respondent's answer correlate to obesity and exercise? The BRFSS computes a variable for us: the BMI, or Body Mass Index. Do people rated by the BRFSS as "Obese" consider themselves healthy? If they exercised in the past 30 days, does that appear to influence their answer?
+
+The BRFSS computes the respondent's BMI category based on reported height and weight. "Obese" is the most extreme of the categories (typically considered 30 lbs or more overweight):
+
+```{r}
+levels(brfss2013$X_bmi5cat)
+```
+
+```{r}
+# Select general health, exercise, and body mass index (BMI) rating, omitting N/A
+bybmi = brfss2013 %>% select(genhlth, exerany2, X_bmi5cat) %>% na.omit()
+self_rated <- bybmi %>% group_by(genhlth, exerany2) %>% filter(X_bmi5cat == "Obese") %>% summarise(count = n())
+self_rated
+```
+
+Here are the tabulated answers for general health ("genhlth"), whether the respondent exercised in the past 30 days ("exerany2") and the counts grouped by those two variables. There does appear to be a correlation between exercise and self-perception of general health among those who rate themselves "Fair" or better: despite being obese, they tend to rate their health better. In fact, only those who rated their general health as "Poor" had a lower rate of exercise. 
+
+```{r}
+
+self_rated <- bybmi %>% group_by(genhlth, exerany2) %>% filter(X_bmi5cat == "Obese")
+g <- ggplot(self_rated, aes(genhlth))
+g + geom_bar(aes(fill = exerany2), position = "dodge")
+
+```
+
+The bar graph makes this quite plane. For each response regarding general health, the ratio greatly decreases.
+
+The point here is that the self-reported general health of the respondent can be subjective; no doubt, exercise is a good and healthy thing. But can a person who is obese be considered healthy? More data exploration might shed light on this question. For example, more variables like high blood pressure, high cholesterol, age, and income level could offer more insights.
+
