@@ -2,7 +2,11 @@
 title: "Inference for numerical data"
 output: statsr:::statswithr_lab
 ---
-
+<style>
+.answer {
+color: #f00;
+}
+</style>
 <div id="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
 platform.
@@ -62,7 +66,7 @@ variable         | description
 <li> The hospitals where the births took place </li> 
 <li> The fathers of the children </li> 
 <li> The days of the births </li>
-<li> The births </li>
+<li class="answer"> <b>The births</b></li>
 </ol>
 
 As a first step in the analysis, we should take a look at the variables in the dataset. 
@@ -92,7 +96,7 @@ summary(nc$gained)
 <ol>
 <li> 0 </li>
 <li> 13 </li>
-<li> 27 </li>
+<li class="answer"> 27 </li>
 <li> 31 </li>
 </ol>
 
@@ -106,11 +110,13 @@ false about the relationship between habit and weight?
 <ol>
 <li> Median birth weight of babies born to non-smoker mothers is slightly higher than that of babies born to smoker mothers. </li>
 <li> Range of birth weights of babies born to non-smoker mothers is greater than that of babies born to smoker mothers. </li>
-<li> Both distributions are extremely right skewed. </li>
+<li class="answer"> Both distributions are extremely right skewed. </li>
 <li> The IQRs of the distributions are roughly equal. </li>
 </ol>
 ```{r habit-weight-box}
-# type your code for the Question 3 here, and Knit
+# side by side box plots of habit and weight (habit being t/f)
+ggplot(nc, aes(x = habit, y = weight)) +
+  geom_boxplot()
 
 ```
 
@@ -135,12 +141,25 @@ test.
 <div id="exercise">
 **Exercise**: Are all conditions necessary for inference satisfied? Comment on each. You can compute the group sizes using the same `by` command above but replacing `mean(weight)` with `n()`.
 </div>
+```{r exercise}
+ggplot(data = nc, aes(x = weight)) +
+  geom_histogram(binwidth = 0.5)
+```
 
+## My answer
+
+<div class="answer">
+<ul>
+<li>It is a random sample because it's in our lab and teacher wouldn't mislead us.</li>
+<li>The data size is sufficiently large (greater than 30)</li>
+<li>We have independence. The weight gain of a mother does not depend on the weight gain of any other mother.</li>
+</ul>
+</div>
 4.  What are the hypotheses for testing if the average weights of babies born to 
 smoking and non-smoking mothers are different?
 <ol>
 <li> $H_0: \mu_{smoking} = \mu_{non-smoking}$; $H_A: \mu_{smoking} > \mu_{non-smoking}$ </li>
-<li> $H_0: \mu_{smoking} = \mu_{non-smoking}$; $H_A: \mu_{smoking} \ne \mu_{non-smoking}$ </li>
+<li class="answer"> $H_0: \mu_{smoking} = \mu_{non-smoking}$; $H_A: \mu_{smoking} \ne \mu_{non-smoking}$ </li>
 <li> $H_0: \bar{x}_{smoking} = \bar{x}_{non-smoking}$; $H_A: \bar{x}_{smoking} > \bar{x}_{non-smoking}$ </li>
 <li> $H_0: \bar{x}_{smoking} = \bar{x}_{non-smoking}$; $H_A: \bar{x}_{smoking} > \bar{x}_{non-smoking}$ </li>
 <li> $H_0: \mu_{smoking} \ne \mu_{non-smoking}$;  $H_A: \mu_{smoking} = \mu_{non-smoking}$ </li>
@@ -176,6 +195,11 @@ For more information on the inference function see the help file with `?inferenc
 **Exercise**: What is the conclusion of the hypothesis test?
 </div>
 
+## My answer
+<div class="answer">
+There is a statistical significance in the difference of the means.
+</div>
+
 5.  Change the `type` argument to `"ci"` to construct and record a confidence 
 interval for the difference between the weights of babies born to nonsmoking and 
 smoking mothers, and interpret this interval in context of the data. Note that by 
@@ -187,11 +211,11 @@ between 0 and 1. Also note that when doing a confidence interval arguments like
 <li> We are 95% confident that babies born to nonsmoker mothers are on average 0.05 to 0.58 pounds lighter at birth than babies born to smoker mothers. </li>
 <li> We are 95% confident that the difference in average weights of babies whose moms are smokers and nonsmokers is between 0.05 to 0.58 pounds. </li>
 <li> We are 95% confident that the difference in average weights of babies in this sample whose moms are smokers and nonsmokers is between 0.05 to 0.58 pounds. </li>
-<li> We are 95% confident that babies born to nonsmoker mothers are on average 0.05 to 0.58 pounds heavier at birth than babies born to smoker mothers. </li>
+<li class="answer"> We are 95% confident that babies born to nonsmoker mothers are on average 0.05 to 0.58 pounds heavier at birth than babies born to smoker mothers. </li>
 </ol>
 ```{r habit-weight-ci}
-# type your code for the Question 5 here, and Knit
-
+inference(y = weight, x = habit, data = nc, statistic = "mean",
+          type = "ci",  method = "theoretical")
 ```
 
 By default the function reports an interval for ($\mu_{nonsmoker} - \mu_{smoker}$)
@@ -211,34 +235,62 @@ interval?
 <li>(38.1526 , 38.5168)</li>
 <li>(38.0892 , 38.5661)</li>
 <li>(6.9779 , 7.2241)</li>
-<li>(38.0952 , 38.5742)</li>
+<li class="answer">(38.0952 , 38.5742)</li>
 </ol>
 ```{r weeks-ci-99}
-# type your code for Question 6 here, and Knit
-
+inference(y = weeks, data = nc, statistic = "mean",
+          type = "ci",  method = "theoretical", conf_level = 0.99)
 ```
 
 <div id="exercise">
 **Exercise**: Calculate a new confidence interval for the same parameter at the 90% confidence level. Comment on the width of this interval versus the one obtained in the the previous exercise.
 </div>
 ```{r weeks-ci-90}
-# type your code for the Exercise here, and Knit
-
+inference(y = weeks, data = nc, statistic = "mean",
+          type = "ci",  method = "theoretical", conf_level = 0.9)
 ```
+
+## My answer:
+
+<div class="answer">They appear identical.</div>
 
 <div id="exercise">
 **Exercise**: Conduct a hypothesis test evaluating whether the average weight gained by younger mothers is different than the average weight gained by mature mothers.
 </div>
 ```{r gained-mature-ht}
-# type your code for the Exercise here, and Knit
-
+inference(y = weight, x = mature, data = nc, statistic = "mean", type = "ht", null = 0, 
+          alternative = "twosided", method = "theoretical")
 ```
 
 7. Now, a non-inference task: Determine the age cutoff for younger and mature 
 mothers. Use a method of your choice, and explain how your method works.
-```{r cutoff-mature}
-# type your code for Question 7 here, and Knit
+```{r cutoff-mature-too}
+younglings <- nc %>% filter(mature == "younger mom")
+summary(younglings$mage)
 
+elders <- nc %>% filter(mature == "mature mom")
+summary(elders$mage)
+```
+
+## My answer...
+
+<div class="answer">
+We see that "younger mom" is up to 34 years old, and 35 is the beginning of the ages of the "mature mom."
+</div>
+
+## My bonus analysis: not so helpful though...
+
+```{r cutoff-mature}
+IQR(younglings$mage, na.rm = TRUE)
+
+IQR(elders$mage, na.rm = TRUE)
+```
+
+## My bonus analysis two...
+
+```{r yay fun wee}
+ggplot(nc, aes(x = mature, y = mage)) +
+  geom_boxplot()
 ```
 
 <div id="exercise">
@@ -247,15 +299,31 @@ mothers. Use a method of your choice, and explain how your method works.
 these variables. Formulate the question in a way that it can be answered using a 
 hypothesis test and/or a confidence interval. Answer your question using the `inference` 
 function, report the statistical results, and also provide an explanation in 
-plain language. Be sure to check all assumptions,state your $\alpha$ level, and conclude 
+plain language. Be sure to check all assumptions, state your $\alpha$ level, and conclude 
 in context. (Note: Picking your own variables, coming up with a research question,
 and analyzing the data to answer this question is basically what you'll need to do for
 your project as well.)
 </div>
 
-```{r pick-your-own}
-# type your code for the Exercise here, and Knit
+## My answer...
 
+<div>
+Is there a statistical difference in premature births and the maturity of the mother? We will look at the categorical variable `premie` and the numerical variable `mage`.
+
+We already know that:
+<ul>
+<li>We are dealing with a random sample</li>
+<li>Our data size is sufficiently large</li>
+<li>Each measurement is independent</li>
+</ul>
+
+We see that we cannot reject the null hypothesis here because we wind up with a p_value of 0.9224.
+
+</div>
+
+```{r pick-your-own}
+inference(y = fage, x = premie, data = nc, statistic = "mean", type = "ht", null = 0, 
+          alternative = "twosided", method = "theoretical")
 ```
 
 
