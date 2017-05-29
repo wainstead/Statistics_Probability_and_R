@@ -1,0 +1,145 @@
+* Instructions
+
+Your project will consist of 4 parts:
+
+** DONE Data: (3 points)
+   CLOSED: [2017-05-28 Sun 14:26]
+- [X] Describe how the observations in the sample are collected, 
+- [X] and the implications of this data collection method on the scope
+of inference (generalizability / causality).
+
+Note that you might will need to look into documentation on the GSS to
+answer this question. See http://gss.norc.org/ as well as the "More
+information on the data" section below.
+** TODO Research question: (3 points)
+- [X] Come up with a research question that you want to answer using
+  these data.
+- [ ] You should phrase your research question in a way that matches
+  up with the scope of inference your dataset allows for. You are
+  welcomed to create new variables based on existing ones.
+- [ ] Along with your research question include a brief discussion
+  (1-2 sentences) as to why this question is of interest to you and/or your audience.
+** DONE EDA: (10 points)
+   CLOSED: [2017-05-28 Sun 18:01]
+Perform exploratory data analysis (EDA) that addresses the research
+question you outlined above. Your EDA should contain numerical
+summaries and visualizations. Each R output and plot should be
+accompanied by a brief interpretation.
+** DONE Inference: (28 points)
+   CLOSED: [2017-05-28 Sun 18:01]
+Perform inference that addresses the research question you outlined
+above. Each R output and plot should be accompanied by a brief
+interpretation.
+** TODO Also
+In addition to these parts, there are also 6 points allocated to
+format, overall organization, and readability of your project. Total
+points add up to 50 points. See the assessment rubric (provided above)
+for more details on how your peers will evaluate your work.
+* More information on inference
+INFERENCE: Statistical inference via hypothesis testing and/or confidence interval.
+
+- State hypotheses
+- Check conditions
+- State the method(s) to be used and why and how
+- Perform inference
+- Interpret results
+- If applicable, state whether results from various methods agree
+
+It is your responsibility to figure out the appropriate
+methodology. What techniques you use to conduct inference will depend
+on the type of data you're using, and your sample size. All of you
+should conduct at least a hypothesis test, and report the associated
+p-value and the conclusion. Those of you comparing two means, two
+medians, or two proportions should also calculate a confidence
+interval for the parameter of interest. Those of you working with
+categorical variables with more than two levels will need to use
+methods like ANOVA and chi-square testing for which there is no
+associated confidence interval, and that's ok. If your data fails some
+conditions and you can't use a theoretical method, then you should use
+an appropriate simulation based method.
+
+- If you can use both theoretical and simulation based methods, then
+  choose one and stick with it. You don't have to do both. However if
+  you can't use both, then you need to decide which is appropriate.
+- If you can do both a hypothesis test and a confidence interval, do
+  both, and comment on agreement of the results from the two
+  methods. However if your variables do not lend themselves to a
+  confidence interval, that's ok.
+- It's essential to make sure the method you're using is appropriate
+  for the dataset and the research question you're working with.
+
+* More information on the data
+
+Since 1972, the General Social Survey (GSS) has been monitoring
+societal change and studying the growing complexity of American
+society. The GSS aims to gather data on contemporary American society
+in order to monitor and explain trends and constants in attitudes,
+behaviors, and attributes; to examine the structure and functioning of
+society in general as well as the role played by relevant subgroups;
+to compare the United States to other societies in order to place
+American society in comparative perspective and develop cross-national
+models of human society; and to make high-quality data easily
+accessible to scholars, students, policy makers, and others, with
+minimal cost and waiting.
+
+GSS questions cover a diverse range of issues including national
+spending priorities, marijuana use, crime and punishment, race
+relations, quality of life, confidence in institutions, and sexual
+behavior.
+
+Source: Duke University Data and Visualization Services
+* Review criteria
+- [X] Is there a well-defined and clearly stated research question?
+- [X] Did the author provide background on the research question as to
+  why they care and why others should also care?
+- [X] Are the hypotheses stated clearly and do they match the research
+  question?
+- [X] Are the conditions checked in context of the data (not just a
+  generic bullet point list of the conditions, but reasoning through
+  them for the given dataset)?
+- [ ] Are the appropriate method(s) the writer will be using stated?
+  Did the author provide a discussion of why they chose these methods,
+  and described how they work? Note that in this part the author
+  should display a thorough and conceptual understanding of how the
+  methodology works, however the write-up does not need to be as
+  detailed as if they were teaching the method to someone with no
+  background in statistics.
+- [ ] Was the correct code used and output provided for all required
+  techniques? See below for which situation requires which technique:
+- [ ] One numerical and one categorical variable (with only 2 levels):
+  hypothesis test + confidence interval parameter of interest =
+  difference between two means (theoretical or simulation)parameter of
+  interest = difference between two medians (simulation only)
+- [ ] One numerical and one categorical variable (with more than 2
+  levels): hypothesis test only compare means across several groups no
+  defined parameter of interest, ANOVA and pairwise tests (theoretical
+  only)
+- [ ] Two categorical variables (each with only 2 levels): hypothesis
+  test + confidence interval parameter of interest = difference
+  between two proportions (theoretical if success-failure condition
+  met, simulation if not)
+- [ ] Two categorical variables (either one or both with more than 2
+  levels): hypothesis test only compare proportions across several
+  groups no defined parameter of interest, Chi-square test only
+  (theoretical if expected sample size condition met, simulation if
+  not)
+- [ ] Are correct interpretations and conclusions for all output
+  provided? Note that this portion should be evaluated based on
+  criteria stated earlier about which technique is required
+  when). This includes some or all of conclusions of hypothesis tests,
+  interpretations of p-values as conditional probabilities, and
+  interpretations of confidence intervals depending on the methods
+  used. All interpretations must be in context of the data and the
+  research question.
+- [ ] Is whether or not results from hypothesis test and confidence
+  interval agree stated? Or, if doing ANOVA or chi-square testing, did
+  the author state that no other methods were applicable and hence
+  there's nothing to compare?
+- [ ] Is there a brief summary of findings that does not repeat
+  previous statements?
+- [ ] Is a discussion of what was learned about the research question
+  provided?
+- [X] Are ideas for possible future research and/or discussion of
+  additional synthesis or possible shortcomings of study provided?
+- [X] Is the writing clear, with few or no grammar, spelling or
+  organization mistakes
