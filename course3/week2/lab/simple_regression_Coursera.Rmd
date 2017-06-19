@@ -442,7 +442,7 @@ variable you decided was the best predictor for runs.
 # type your code for the Exercise here, and Knit
 ggplot(data = new_obs_lm, aes(x = .resid)) +
   geom_histogram(binwidth = 25) +
-  xlab("Residuals (strikeouts, runs)")
+  xlab("Residuals (on base and slugging, runs)")
 
 ggplot(data = new_obs_lm, aes(sample = .resid)) +
   stat_qq()
