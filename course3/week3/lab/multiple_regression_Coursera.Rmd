@@ -36,6 +36,11 @@ references:
   edition: 1
   ISBN: 9780521686891
 ---
+<style>
+.answer {
+color: #f00;
+}
+</style>
 
 <div id="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
@@ -120,14 +125,14 @@ variable         | description
 
 1. Is this an observational study or an experiment?
 <ol>
-<li> Observational study </li>
+<li class="answer"> Observational study </li>
 <li> Experiment </li>
 </ol>
 
 2. The original research question posed in the paper is whether beauty leads directly to the differences in course evaluations.  Given the study design, should the question be rephrased? If so, how? 
 <ol>
 <li> No, the question is worded accurately. </li>
-<li> Yes, revise wording to "Is there an association between beauty and course evaluations?" </li>
+<li class="answer"> Yes, revise wording to "Is there an association between beauty and course evaluations?" </li>
 <li> Yes, revise wording to "Does beauty score increase the professor's course evaluations?"  </li>
 <li> Yes, revise wording to "Does beauty score decrease the professor's course evaluations?" </li>
 </ol>
@@ -139,11 +144,13 @@ variable         | description
 <li> The median of the distribution is 4.3. </li>
 <li> 25\% of the students gave their professors a score of over 4.6. </li> 
 <li> 11 of students gave a professor a score below 3. </li> 
-<li> The left skewness of the data suggests that the students are less likely to rate the professors highly. </li>
+<li class="answer"> The left skewness of the data suggests that the students are less likely to rate the professors highly. </li>
 </ol>
 ```{r score-dist}
 # type your code for Question 3 here, and Knit
-
+summary(evals$score)
+hist(evals$score)
+plot(evals$score)
 ```
 
 <div id="exercise">
@@ -153,7 +160,9 @@ or mosaic plot).
 </div>
 ```{r two-vars-eda}
 # type your code for the Exercise here, and Knit
-
+#qplot(evals$age, evals$bty_avg)
+sp <- ggplot(evals, aes(x=age, y=bty_avg))
+sp + geom_point() + stat_smooth(method=lm)
 ```
 
 ## Simple linear regression
@@ -178,7 +187,8 @@ about the initial scatterplot?
 </div>
 ```{r jitter}
 # type your code for the Exercise here, and Knit
-
+ggplot(data = evals, aes(x = bty_avg, y = score)) +
+  geom_jitter()
 ```
 
 Let's see if the apparent trend in the plot is something more than 
@@ -207,25 +217,33 @@ interpret the slope.
 </div>
 ```{r summary-model}
 # type your code for the Exercise here, and Knit
+# sp <- ggplot(evals, aes(x=bty_avg, y=score))
+# sp + geom_jitter() + stat_smooth(method=lm)
 
+score_bty = lm(score ~ bty_avg, data = evals)
+summary(score_bty)
 ```
+<div class="answer">
+y-hat = 3.88034 + 0.0664 * x
+</div>
 
 4. Average beauty score is a statistically significant predictor of evaluation score. 
 <ol> 
-<li> True </li>
-<li> False </li>
+<li class="answer"> True (because there is a clear (if weak) relationship even though the slope is small)</li>
+<li> False</li>
 </ol>
 
-5. Use residual plots to evaluate whether the conditions of least squares regression are reasonable.  Which of the following statements is an incorrect analysis of the residual plots and conditions? 
+5. Use residual plots to evaluate whether the conditions of least squares regression are reasonable.  Which of the following statements is an <b>incorrect</b> analysis of the residual plots and conditions? 
 <ol>
 <li> Linear association: The residuals plot shows a random scatter. </li>
 <li> Constant variance of residuals: No fan shape in residuals plot. </li>
-<li> Nearly normal residuals: Residuals are right skewed, but the sample size is large, so this may not be an important violation of conditions. </li>
+<li class="answer"> Nearly normal residuals: Residuals are right skewed, but the sample size is large, so this may not be an important violation of conditions. (In fact there's a left skew).</li>
 <li> Independent observations: Classes sampled randomly, no order effect. </li>
 </ol>
 ```{r diag-score-bty_avg}
 # type your code for the Question 5 here, and Knit
-
+plot(score_bty$residuals)
+hist(score_bty$residuals)
 ```
 
 ## Multiple linear regression
@@ -266,15 +284,16 @@ m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
 summary(m_bty_gen)
 ```
 
-6. P-values and parameter estimates should only be trusted if the conditions for the regression are reasonable. Using diagnostic plots, we can conclude that the conditions for this model are reasonable. 
+6. P-values and parameter estimates should only be trusted if the conditions for the regression are reasonable. Using diagnostic plots, we can conclude that the conditions for this model are reasonable. <span class="answer">The wording here is vague, and the correct answer was "true." It apparently asks about models in general, even though the wording is "for this model."</span>
 <ol>
-<li> True </li>
+<li class="answer"> True </li>
 <li> False </li>
 </ol>
 </div>
 ```{r diag-mlr-model}
 # type your code for the Exercise here, and Knit
-
+plot(m_bty_gen$residuals)
+hist(m_bty_gen$residuals)
 ```
 
 <div id="exercise">
@@ -284,7 +303,8 @@ model changed the parameter estimate for `bty_avg`?
 </div>
 ```{r summary-mlr-model}
 # type your code for the Exercise here, and Knit
-
+all_bty = lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval + cls_did_eval + cls_students + cls_level + cls_profs + cls_credits + bty_f1lower + bty_f1upper + bty_f2upper + bty_m1lower + bty_m1upper + bty_m2upper + bty_avg + pic_outfit + pic_color, data = evals)
+summary(all_bty)
 ```
 
 Note that the estimate for `gender` is now called `gendermale`. You'll see this 
@@ -305,7 +325,7 @@ the intercept and slope form familiar from simple regression.
 
 7. For two professors (one male and one female) who received the same beauty rating, the male professor is predicted to have the higher course evaluation score than the female.
 <ol>
-<li> True </li>
+<li class="answer"> True </li>
 <li> False </li>
 </ol>
 
@@ -323,14 +343,15 @@ tenure track, tenured.
 </div>
 ```{r new-mlr-model}
 # type your code for the Exercise here, and Knit
-
+m_bty_rank <- lm(score ~ bty_avg + rank, data = evals)
+summary(m_bty_rank)
 ```
 
 8. Which of the following is the correct order of the three levels of rank if we were to order them from lowest predicted course evaluation score to highest predicted course evaluation score? 
 <ol>
 <li> Teaching, Tenure Track, Tenured </li>
 <li> Tenure track, Tenured </li>
-<li> Tenure Track, Tenured, Teaching </li>
+<li class="answer"> Tenure Track, Tenured, Teaching </li>
 <li> Teaching, Tenured, Tenure Track </li>
 </ol>
 
@@ -406,7 +427,7 @@ output in your response.
 9. Which of the following is the correct intrepetation of the coefficient associated with the ethnicity variable. <br> Non-minority professors are expected on average to score ... 
 <ol>
 <li> 0.12 points lower than minority professors, all else held constant. </li>
-<li> 0.12 points higher than minority professors, all else held constant. </li> 
+<li class="answer"> 0.12 points higher than minority professors, all else held constant. </li> 
 <li> 0.02 points lower than minority professors, all else held constant. </li>
 <li> 0.02 points higher than minority professors, all else held constant. </li>
 </ol>
@@ -421,6 +442,10 @@ the other explanatory variables?
 </div>
 ```{r p-val-select}
 # type your code for the Exercise here, and Knit
+m_full_less_one <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval 
+             + cls_students + cls_level + cls_credits + bty_avg 
+             + pic_outfit + pic_color, data = evals)
+summary(m_full_less_one)
 
 ```
 
@@ -449,13 +474,15 @@ the highest improvement in the adjusted $R^2$.
 </div>
 ```{r adj-rsq-select}
 # type your code for the Exercise here, and Knit
-
+m3 <- lm(score ~ ethnicity + gender + language + age + cls_perc_eval 
+             + cls_students + cls_level + cls_credits + bty_avg, data = evals)
+summary(m3)$adj.r.squared
 ```
 
 10. Elimination of which variable from the full model yielded the highest adjusted R-squared? 
 <ol>
 <li> `bty_avg` </li>
-<li> `cls_profs` </li> 
+<li class="answer"> `cls_profs` </li> 
 <li> `cls_students` </li>
 <li> `rank` </li>
 </ol>
