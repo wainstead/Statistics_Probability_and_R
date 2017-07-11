@@ -1,0 +1,43 @@
+* Two main objectives
+** TODO She is interested in learning what attributes make a movie popular
+** TODO She is also interested in learning something new about movies
+Perhaps correlating high scores to release month? But isn't that
+putting the cart before the horse? Releasing a bad movie in July or
+December might not make a difference.
+* We are given the release day, month, and year
+Can we correlate to holiday weekends? That would require finding and
+adding more data.
+* I can see a few Y's here
+- Oscar nominations (there are a few categories)
+- critics_rating
+- imdb_rating
+- audience_rating
+- audience_score
+
+to name a few.
+* Maybe look at the distributions of the different ratings
+How skewed are the different ratings systems?
+** audience_score
+> summary(movies$audience_score)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  11.00   46.00   65.00   62.36   80.00   97.00 
+> barplot(movies$audience_score)
+> hist(movies$audience_score)
+* Maybe look at negative correlations too
+As you add more of X, you get less of Y
+* things to lose, things of particular interest
+- title
+- title_type
+- studio is probably not helpful, but we could tell our boss to watch
+  movies from other studios (we work at Paramount)
+- release year isn't helpful
+- dvd release data might be useless, but... does it affect ratings?
+  What if we compare theatrical release date to DVD release date?
+- Does the number of iMDB votes matter?
+- top200_box is interesting, as dollars matter
+* Maybe divide the data into two sets
+- Both audience and critics ratings good
+- Both audience and critics ratings bad
+(Maybe also use the top 200 thing).
+Then use multiple linear regression to see what correlates to good and
+bad films
