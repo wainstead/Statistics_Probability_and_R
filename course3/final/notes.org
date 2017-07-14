@@ -1,13 +1,76 @@
-* Two main objectives
-** TODO She is interested in learning what attributes make a movie popular
-** TODO She is also interested in learning something new about movies
-Perhaps correlating high scores to release month? But isn't that
-putting the cart before the horse? Releasing a bad movie in July or
-December might not make a difference.
-* We are given the release day, month, and year
+* Checklist
+** Two main objectives
+*** TODO She is interested in learning what attributes make a movie popular
+*** TODO She is also interested in learning something new about movies
+** Your project will consist of 6 parts:
+*Make sure these points are addressed!*
+As part of this project you will complete exploratory data analysis
+(EDA), modeling, and prediction.
+
+All template and rubric files that you will need to complete this
+project can be found on the Project Files and Rubric page.
+*** Data: (3 points)
+**** Describe how the observations in the sample are collected, and
+**** the implications of this data collection method on the scope
+of inference (generalizability / causality).
+*** Research question: (3 points)
+**** Come up with a research question
+that you want to answer using these data and a multiple linear
+regression model.
+**** You should phrase your research question
+in a way that matches up with the scope of inference your dataset
+allows for.
+**** You are welcomed to create new variables based on existing ones.
+**** Along with your research question include a brief discussion
+(1-2 sentences) as to why this question is of interest to you and/or
+your audience.
+*** EDA: (10 points)
+**** Perform exploratory data analysis (EDA) that addresses
+the research question you outlined above.
+**** Your EDA should contain numerical summaries and visualizations.
+**** Your EDA does not have to touch on every single variable that
+you are considering for your model, but what you choose to present
+should be a deliberate (not haphazard) selection. This might mean you
+initially create a lot more visualizations and summary statistics than
+what you finally choose to include in your paper.
+**** Each R output and plot should be accompanied
+by a brief interpretation.
+*** Modeling: (20 points)
+**** Develop a multiple linear regression model
+to predict a numerical variable in the dataset.
+**** The response variable and the explanatory variables
+can be existing variables in the dataset, or new variables you create
+based on existing variables.
+*** Prediction: (5 points)
+**** Pick a movie from 2016 (a new movie that is not in the sample)
+and
+***** do a prediction for this movie using your the model
+you developed and
+***** the `predict` function in R.
+***** Also quantify the uncertainty around this prediction
+using an appropriate interval.
+*** Conclusion: (3 points)
+**** A brief summary of your findings from the previous sections without
+repeating your statements from earlier
+**** as well as a discussion of what you have learned about the data
+and your research question.
+**** You should also discuss any shortcomings of your current study
+(either due to data collection or methodology) and include ideas for
+possible future research.
+
+** In addition to these parts, there are also 6 points allocated to:
+- format
+- overall organization
+- readability of your project
+
+Total points add up to 50 points. See the assessment rubric on the
+Project Files and Rubric page for more details on how your peers will
+evaluate your work.
+* Notes on the data
+** We are given the release day, month, and year
 Can we correlate to holiday weekends? That would require finding and
 adding more data.
-* I can see a few Y's here
+** I can see a few Y's here
 - Oscar nominations (there are a few categories)
 - critics_rating
 - imdb_rating
@@ -15,17 +78,17 @@ adding more data.
 - audience_score
 
 to name a few.
-* Maybe look at the distributions of the different ratings
+** Maybe look at the distributions of the different ratings
 How skewed are the different ratings systems?
-** audience_score
+*** audience_score
 > summary(movies$audience_score)
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   11.00   46.00   65.00   62.36   80.00   97.00 
 > barplot(movies$audience_score)
 > hist(movies$audience_score)
-* Maybe look at negative correlations too
+** Maybe look at negative correlations too
 As you add more of X, you get less of Y
-* things to lose, things of particular interest
+** things to lose, things of particular interest
 - title
 - title_type
 - studio is probably not helpful, but we could tell our boss to watch
@@ -35,9 +98,13 @@ As you add more of X, you get less of Y
   What if we compare theatrical release date to DVD release date?
 - Does the number of iMDB votes matter?
 - top200_box is interesting, as dollars matter
-* Maybe divide the data into two sets
+** Maybe divide the data into two sets
 - Both audience and critics ratings good
 - Both audience and critics ratings bad
 (Maybe also use the top 200 thing).
 Then use multiple linear regression to see what correlates to good and
 bad films
+
+** Perhaps correlating high scores to release month?
+But isn't that putting the cart before the horse? Releasing a bad
+movie in July or December might not make a difference.
