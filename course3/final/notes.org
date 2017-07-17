@@ -1,7 +1,9 @@
 * Checklist
 ** Two main objectives
-*** TODO She is interested in learning what attributes make a movie popular
-*** TODO She is also interested in learning something new about movies
+*** DONE She is interested in learning what attributes make a movie popular
+	 CLOSED: [2017-07-16 Sun 22:23]
+*** DONE She is also interested in learning something new about movies
+	 CLOSED: [2017-07-16 Sun 22:23]
 ** Your project will consist of 6 parts:
 *Make sure these points are addressed!*
 As part of this project you will complete exploratory data analysis
@@ -10,51 +12,70 @@ As part of this project you will complete exploratory data analysis
 All template and rubric files that you will need to complete this
 project can be found on the Project Files and Rubric page.
 *** Data: (3 points)
-**** TODO Describe how the observations in the sample are collected, and
-**** TODO the implications of this data collection method on the scope
+**** DONE Describe how the observations in the sample are collected, and
+	 CLOSED: [2017-07-16 Sun 22:24]
+**** DONE the implications of this data collection method on the scope
+	 CLOSED: [2017-07-16 Sun 22:24]
 of inference (generalizability / causality).
 *** Research question: (3 points)
-**** TODO Come up with a research question
+**** DONE Come up with a research question
+	 CLOSED: [2017-07-16 Sun 22:24]
 that you want to answer using these data and a multiple linear
 regression model.
-**** TODO You should phrase your research question
+**** DONE You should phrase your research question
+	 CLOSED: [2017-07-16 Sun 22:24]
 in a way that matches up with the scope of inference your dataset
 allows for.
-**** TODO You are welcomed to create new variables based on existing ones.
-**** TODO Along with your research question include a brief discussion
+**** DONE You are welcomed to create new variables based on existing ones.
+	 CLOSED: [2017-07-16 Sun 22:24]
+**** DONE Along with your research question include a brief discussion
+	 CLOSED: [2017-07-16 Sun 22:24]
 (1-2 sentences) as to why this question is of interest to you and/or
 your audience.
 *** EDA: (10 points)
-**** TODO Perform exploratory data analysis (EDA) that addresses
+**** DONE Perform exploratory data analysis (EDA) that addresses
+	 CLOSED: [2017-07-16 Sun 22:24]
 the research question you outlined above.
-**** TODO Your EDA should contain numerical summaries and visualizations.
-**** TODO Your EDA does not have to touch on every single variable that
+**** DONE Your EDA should contain numerical summaries and visualizations.
+	 CLOSED: [2017-07-16 Sun 22:24]
+**** DONE Your EDA does not have to touch on every single variable that
+	 CLOSED: [2017-07-16 Sun 22:24]
 you are considering for your model, but what you choose to present
 should be a deliberate (not haphazard) selection. This might mean you
 initially create a lot more visualizations and summary statistics than
 what you finally choose to include in your paper.
-**** TODO Each R output and plot should be accompanied
+**** DONE Each R output and plot should be accompanied
+	 CLOSED: [2017-07-16 Sun 23:05]
 by a brief interpretation.
 *** Modeling: (20 points)
-**** TODO Develop a multiple linear regression model
+**** DONE Develop a multiple linear regression model
+	 CLOSED: [2017-07-16 Sun 23:06]
 to predict a numerical variable in the dataset.
-**** TODO The response variable and the explanatory variables
+**** DONE The response variable and the explanatory variables
+	 CLOSED: [2017-07-16 Sun 23:06]
 can be existing variables in the dataset, or new variables you create
 based on existing variables.
 *** Prediction: (5 points)
-**** TODO Pick a movie from 2016 (a new movie that is not in the sample)
+**** DONE Pick a movie from 2016 (a new movie that is not in the sample)
+	 CLOSED: [2017-07-16 Sun 23:06]
 and
-***** TODO do a prediction for this movie using your the model
+***** DONE do a prediction for this movie using your the model
+	  CLOSED: [2017-07-16 Sun 23:06]
 you developed and
-***** TODO the `predict` function in R.
-***** TODO Also quantify the uncertainty around this prediction
+***** DONE the `predict` function in R.
+	  CLOSED: [2017-07-16 Sun 23:06]
+***** DONE Also quantify the uncertainty around this prediction
+	  CLOSED: [2017-07-16 Sun 23:06]
 using an appropriate interval.
 *** Conclusion: (3 points)
-**** TODO A brief summary of your findings from the previous sections without
+**** DONE A brief summary of your findings from the previous sections without
+	 CLOSED: [2017-07-16 Sun 23:06]
 repeating your statements from earlier
-**** TODO as well as a discussion of what you have learned about the data
+**** DONE as well as a discussion of what you have learned about the data
+	 CLOSED: [2017-07-16 Sun 23:06]
 and your research question.
-**** TODO You should also discuss any shortcomings of your current study
+**** DONE You should also discuss any shortcomings of your current study
+	 CLOSED: [2017-07-16 Sun 23:06]
 (either due to data collection or methodology) and include ideas for
 possible future research.
 
@@ -108,3 +129,20 @@ bad films
 ** Perhaps correlating high scores to release month?
 But isn't that putting the cart before the horse? Releasing a bad
 movie in July or December might not make a difference.
+** Filly Brown URLs
+https://www.imdb.com/title/tt1869425/
+https://www.rottentomatoes.com/m/filly_brown_2012/
+
+https://www.dropbox.com/s/i2u3lczsq641ty4/Screenshot%202017-07-15%2014.44.13.png?dl=0
+** She wants to know what makes a movie "popular"
+So we should go by audience scores and not critic's scores... but crit
+scores do seem to be a predictor of audience scores.
+** Time to DVD release
+
+movies_cleaned_years <- movies_cleaned %>% filter(!is.na(dvd_rel_year)) %>% filter(!is.na(thtr_rel_year))
+
+movies_cleaned_years <- movies_cleaned_years %>% mutate(days_to_dvd_release = as.Date(sprintf("%d-%d-%d", dvd_rel_year, dvd_rel_month, dvd_rel_day)) - as.Date(sprintf("%d-%d-%d", thtr_rel_year, thtr_rel_month, thtr_rel_day)))
+
+does_dvd_matter <- lm(audience_score ~ as.numeric(days_to_dvd_release, units="days"), data = movies_cleaned_years)
+
+summary(does_dvd_matter)
