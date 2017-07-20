@@ -7,11 +7,8 @@ output:
     theme: spacelab
 ---
 
-## Setup
-
-### Load packages
-
 ```{r load-packages, message = FALSE}
+# Load libraries and data
 library(ggplot2)
 library(dplyr)
 library(statsr)
@@ -24,62 +21,266 @@ load("movies.Rdata")
 
 ## Part 1: Data
 
+#### How the data was collected
+
+Our Coursera instructors provided us with a random sample of movies from the web sites [IMDb](https://imdb.com) and [Rotten Tomatoes](https://rottentomatoes.com). Although they do not tell us how this random selection process was chosen we place our faith in our instructors that it was done well.
+
+#### Survey methodologies
+
+We are given scores and ratings of the randomly selected films from three sources:
+
+ * Critics reviews gathered by IMDb
+ * Audience reviews from IMDb
+ * Audience reviews from Rotten Tomatoes
+
+Both IMDb and Rotten Tomatoes build their scores based on user reviews, which suffer from biases similar to online polls. This [quote from the New York Times](https://www.nytimes.com/2016/09/29/us/politics/why-you-shouldnt-believe-most-online-polls.html) pertains to election polling done on news websites and blogs, but the concerns are the same for our audience scores:
+
+<blockquote>
+"[Online polls] do a good job of engaging audiences online, and they do a good job of letting you know how other people who have come to the webpage feel about whatever issue," said Mollyann Brodie, the executive director for public opinion and survey research at the Kaiser Family Foundation. "But they're not necessarily good at telling you, in general, what people think, because we don't know who's come to that website and who's taken it."
+
+Professional pollsters use scientific statistical methods to make sure that their small random samples are demographically appropriate to indicate how larger groups of people think. Online polls do nothing of the sort, and are not random, allowing anyone who finds the poll to vote.
+
+<i>("Why You Shouldn't Trust 'Polls' Conducted Online," New York Times, September 28, 2016)</i>
+</blockquote>
+
+The critics scores are derived by an expert judgement of the critics reviews by people at Rotten Tomatoes. We do not know the process of human judgement that produces a score for a given critic's review -- how it might be 45% versus 50% -- but we won't be using critics reviews here, since our boss at Paramount is concerned about what makes a movie <i>popular</i>, as opposed to <i>critically acclaimed</i>. In fact, a critic's score might actually be a predictor of the audience score.
+
+#### Implications for inference
+
+I believe it was the computer security guru Bruce Schneier who once said, "For marketing purposes, 30% accuracy can be good enough." Perhaps it was a wry comment, but he meant that when you are trying to market a product to people having a 30% accuracy in reaching the correct audience is better than marketing to purely randomly selected people.
+
+In that spirit, despite the bias problems with the audience scoring addressed above, at the very least our inferences will tell us what kinds of films IMDb or Rotten Tomatoes reviewers will like. <b>We will treat the audience scores, for this report, as having veracity for generalizing to the greater population.</b>
+
+Note that we can only <b>correlate</b> movie parameters to audience score. We cannot infer causality even if we were guaranteed the audience scores came from randomly selected reviewers.
+
+####
+
+For me personally, the interest here is general. I've been a movie lover pretty much all of my life. I lived in New York City for twelve years, where going to the movies borders on being a sport. As a kid I saw "Star Wars" twelve times in the theater in its original run in 1977. I have been an avid fan of "Mystery Science Theater 3000", have seen countless films in art house cinemas, and even sat through the film adaptation of "Battlefield Earth," which gets a 3% rating on Rotten Tomatoes (which sounds a bit high).
 
 * * *
 
 ## Part 2: Research question
 
+Our boss here at Paramount Pictures poses two questions for us:
 
+ * She is interested in learning what attributes make a movie popular
+ * She is also interested in learning something new about movies
+ 
+We will use multiple linear regression to answer her first question.
+ 
+As to learning something new: consider that a movie has a theatrical release date and a DVD release date. If we measure the amount of time from the theatrical release to the DVD release, does that length of time correlate to the popularity of the movie?
+ 
+To speculate why this might be, we can think about a given movie having a "hype cycle." A film may have an enormous amount of hype leading up to its release. It may do well at the box office. If the movie studio waits too long to release the DVD then perhaps both sales of the DVD and "online hype" (which probably generates more iMDB and Rotten Tomatoes responses) may suffer. We might see this in a negative correlation between the number of days and audience score.
+ 
+One concern here may be: "Does this question call for time-series data?" This is one of the conditions for the least squares line we will plot. Because we deal, ultimately, with an integer (number of days from theatrical release to DVD release) this should not pose a problem.
 
 * * *
 
 ## Part 3: Exploratory data analysis
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
-```{r audience-score}
-summary(movies$audience_score)
-hist(movies$audience_score)
-```
-```{r audience-rating}
-summary(movies$audience_rating)
-qplot(movies$audience_rating, geom="bar")
+#### For our first question: cleaning up the data for the multiple linear regression
+
+Our instructions list several things to remove: actor1 through actor5 and the URIs for the films. We'll also leave out the director and title_type. At first I left in "studio" thinking my boss would want to know which studios netted films with higher scores, all other predictors held equal; but this made the output messy and the data looked somewhat questionable:
+
+<pre>
+## studioWalt Disney Home Entertainment            38.31529   20.15666
+## studioWalt Disney Pictures                      13.97832   10.88395
+## studioWalt Disney Productions                    3.59856   13.25061
+</pre>
+
+Walt Disney Home Entertainment does not create releases for theaters, I believe. Also Paramount Pictures (my boss) cannot control for 'movie studio' so I decided to omit it.
+
+```{r make-full-model}
+# Keep 'title' in case we want to identify a single film
+movies_for_lm <- movies %>% select(title, genre, runtime, mpaa_rating, imdb_rating, imdb_num_votes, critics_rating, critics_score, audience_rating, audience_score, best_pic_nom, best_pic_win, best_actor_win, best_actress_win, best_dir_win, top200_box)
+
+str(movies_for_lm)
 ```
 
-```{r imdb-rating}
-summary(movies$imdb_rating)
-hist(movies$imdb_rating)
+#### For our second question: data analysis about the number of days between release dates
+
+We need to compute the number of days from the date of the theatrical release to the release date of the DVD. First, let's remove all films that have 'NA' for any release year.
+
+```{r clean-na}
+movies_rel <- movies %>% filter(!is.na(dvd_rel_year)) %>% filter(!is.na(thtr_rel_year))
+dim(movies_rel)
+```
+That removed eight entries. Let's compute the number of days between theatrical release date and DVD release date.
+
+```{r make-days-int}
+# Build a new column of type Date for the theatrical release date
+movies_rel <- movies_rel %>% mutate(theatrical_release_date = as.Date(sprintf("%d-%d-%d", thtr_rel_year, thtr_rel_month, thtr_rel_day)))
+
+# Build another new column of type Date for the DVD release date
+movies_rel <- movies_rel %>% mutate(dvd_release_date = as.Date(sprintf("%d-%d-%d", dvd_rel_year, dvd_rel_month, dvd_rel_day)))
+
+# Finally, calculate the number of days from theatrical release to DVD release
+movies_rel <- movies_rel %>% mutate(days_to_dvd_release = as.numeric(dvd_release_date - theatrical_release_date, units="days"))
+
 ```
 
-```{r critics-rating}
-ratings <- movies$critics_rating
-summary(ratings)
-qplot(ratings, geom="bar")
+And finally let's do a linear regression with our new predictor, days_to_dvd_release, and our response variable audience_score from Rotten Tomatoes:
+
+```{r days-released-dvd}
+does_dvd_matter <- lm(audience_score ~ days_to_dvd_release, data = movies_rel)
+summary(does_dvd_matter)
 ```
 
-```{r critics-score}
-summary(movies$critics_score)
+Wow, talk about "no correlation!" I wonder, then, if something is wrong with our assumption. Let's look at the years for the releases:
+
+```{r theater-years}
+ggplot(data = movies_rel, aes(x = thtr_rel_year)) + geom_bar(fill="darkslateblue") + labs(title = "Theatrical Release Year")
 ```
 
+Ah. We have data for movies released in the 1970s, so the DVD release date will be pretty long after the theatrical release date! Let's look at the distribution of years for DVD release date:
+
+```{r plot-release-year}
+ggplot(data = movies_rel, aes(x = dvd_rel_year)) + geom_bar(fill="darkslateblue") + labs(title = "DVD Release Year")
+```
+
+Quite a difference. What we really want, then, is to compare the theatrical release date to the DVD release date for films whose theatrical release date corresponds <i>to the popularity of the DVD format</i>. I had not taken into account three things:
+<ol>
+<li>We have films whose theatrical release date come from a time when there simply was no "home release" (prior to the VHS format)</li>
+<li>DVDs didn't actually make it to the consumer market until after 1995 (per [Wikipedia](https://en.wikipedia.org/wiki/DVD))</li>
+<li>The Blu-Ray format was introduced in 2003 and saw significant sales starting in 2006, at the expense of the DVD format (again, [per Wikipedia](https://en.wikipedia.org/wiki/Blu-ray#Future_scope_and_market_trends))</li>
+</ol>
+
+With these realizations we can narrow our data to account for these facts. Let's assume the years of 2000 to 2010 as the "heyday" of DVD sales and limit our model to films with theatrical releases in those years:
+
+```{r winnow-films}
+movies_dvd <- movies_rel %>% filter(thtr_rel_year >= 2000, thtr_rel_year <= 2010)
+ggplot(data = movies_dvd, aes(x = factor(thtr_rel_year))) + geom_bar(fill="darkslateblue") + labs(title = "Theatrical Release Year 2000-2010")
+```
+
+Now we should have better data to make our inference.
+
+```{r dvd-at-last}
+does_dvd_matter <- lm(audience_score ~ days_to_dvd_release, data = movies_dvd)
+summary(does_dvd_matter)
+```
+
+While we still see a slope for days_to_dvd_release that is pretty much zero at least it's not astronomically tiny as it was before. More on this in our "Inference" section below. Note we have three films whose DVDs came out on or before the theatrical release:
+
+```{r scatterplot-days-to-dvd-release}
+ggplot(data = movies_dvd, aes(x = days_to_dvd_release, y = audience_score)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE)
+```
+
+and those films are:
+
+```{r list-strange-films}
+direct_to_dvd_maybe <- movies_dvd[movies_dvd$days_to_dvd_release < 0,]
+direct_to_dvd_maybe[c("title", "genre", "thtr_rel_year", "dvd_rel_year")]
+```
+
+but this doesn't qualify them as outliers and they probably have little influence on the model.
 
 * * *
 
 ## Part 4: Modeling
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+For our multiple linear regression we will use <i>Adjusted R-squared</i>, which is better suited for making predictions. Let's start by looking at the full model using the audience score from Rotten Tomatoes:
+
+```{r full-model}
+full_model <- lm(audience_score ~ genre + runtime + mpaa_rating + critics_score + best_pic_nom + best_pic_win + best_actor_win + best_actress_win + best_dir_win + top200_box, data = movies_for_lm)
+summary(full_model)
+```
+
+To save space (and scrolling) I'll just print out the Adjusted R-squared value.
+
+After performing <i>backwards elimination</i> for Adjusted R-squared for the Rotten Tomatoes audience scores, we wind up with an Adjusted R-squared value of about 0.526.
+
+```{r rt-model}
+rt_model <- lm(audience_score ~ genre + runtime + mpaa_rating + critics_score + best_pic_nom + best_dir_win + top200_box, data = movies_for_lm)
+summary(rt_model)$adj.r.squared
+```
+
+Plotting the residuals, the scatter and distribution look good:
+
+```{r rt-residuals-plot}
+plot(rt_model$residuals)
+hist(rt_model$residuals)
+```
+
+
+If we use IMDb's ratings as our predicted value, again for Adjusted R-squared using backwards elimination we arrive at:
+
+```{r imdb-model}
+imdb_model <- lm(imdb_rating ~ genre + runtime + mpaa_rating + critics_score + best_pic_nom + best_dir_win + top200_box, data = movies_for_lm)
+summary(imdb_model)$adj.r.squared
+```
+
+which gets a higher Adjusted R-squared for the same parameters. Plotting the residuals here looks good too:
+
+```{r plot-imdb-model}
+plot(imdb_model$residuals)
+hist(imdb_model$residuals)
+```
+
+so both models appear to meet the requirements for multiple linear regression.
 
 * * *
 
 ## Part 5: Prediction
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+We'll test our model with the Disney animated film [Zootopia](https://en.wikipedia.org/wiki/Zootopia). We'll run our predictions for both Rotten Tomatoes and IMDb.
+
+```{r prediction}
+Zootopia <- data.frame(genre="Comedy", runtime=108, mpaa_rating="PG", critics_score=98, best_pic_nom="no", best_dir_win="no", top200_box="yes")
+```
+
+First we predict with our Rotten Tomatoes model:
+```{r rt_model_predict}
+predict(rt_model, newdata=Zootopia, interval="confidence", level=.95)
+
+```
+
+And then our IMDb model:
+
+```{r imdb_model_predict}
+predict(imdb_model, newdata=Zootopia, interval="confidence", level=.95)
+```
+
+Our Rotten Tomatoes model predicts a score of 82% with a 95% confidence interval of (74%, 90%). Zootopia might be an outlier: the actual Rotten Tomatoes audience score is [92%](https://www.rottentomatoes.com/m/zootopia/).
+
+Our IMDb model predicts a score of 7.3 with a 95% confidence interval of (6.9, 7.7). The actual score on IMDb is [8.1](http://www.imdb.com/title/tt1431045/).
+
+Since our data consists primarily of live action films (as opposed to animated films like Zootopia) let's try something else: [Deadpool](https://en.wikipedia.org/wiki/Deadpool_(film)):
+
+```{r deadpool}
+Deadpool <- data.frame(genre="Action & Adventure", runtime=108, mpaa_rating="R", critics_score=84, best_pic_nom="no", best_dir_win="no", top200_box="yes")
+```
+
+Again we first use our Rotten Tomatoes model:
+
+```{r deadpool-rt-model}
+predict(rt_model, newdata=Deadpool, interval="confidence", level=.95)
+
+```
+
+And again with our IMDb model:
+
+```{r deadpool-imdb-model}
+predict(imdb_model, newdata=Deadpool, interval="confidence", level=.95)
+
+```
+
+We see a Rotten Tomatoes prediction of 77% with a 95% CI of (69%, 85%). The actual score is [84%](https://www.rottentomatoes.com/m/deadpool).
+
+For our IMDb prediction we get 7.2 with a 95% CI of (6.9, 7.6). The actual IMDb score for Deadpool is [8.0](http://www.imdb.com/title/tt1431045/?ref_=fn_al_tt_1).
 
 * * *
 
 ## Part 6: Conclusion
 
+We were tasked with two items from our boss at Paramount Pictures:
+
+ * What attributes make a movie popular
+ * Find out something new about movies
+ 
+What makes a movie popular? There are far more variables than we were provided. I can imagine more complex models that account for the combination of actors and actresses, the producers, the screenwriters, holiday releases, and so on. In fact, there are probably models we can write that are specific to genres like animated films. One model (or two) cannot work for films as diverse as Zootopia and Deadpool, which are quite different. Our two models came pretty close to predicting our two movies; in fact the Rotten Tomatoes model correctly predicted Deadpool's audience rating.
+ 
+For the second item we have shown that there is no correlation between the number of days between the theatrical release and the DVD release of a film and the audience score. In data science it can be just as important to discover "There is *no* correlation" as it is to find a correlation.
+
+Note, though, that the number of days between release dates is probably very important in terms of <i>DVD sales</i>, something we are not measuring. We can guess that the movie studios know very well that waiting too long to bring a DVD to market after the theatrical release can negatively impact sales.
