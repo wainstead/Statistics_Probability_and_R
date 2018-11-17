@@ -4,6 +4,12 @@ runtime: shiny
 output: statsr:::statswithr_lab
 ---
 
+<style>
+.answer {
+  color: #f00;
+}
+</style>
+
 ```{r echo=FALSE}
 suppressMessages(library(magrittr))
 suppressMessages(library(statsr))
@@ -74,7 +80,7 @@ $$
 1. Based on the preceding result, what is the probability that Machine 1 is "Bad" given you won playing on Machine 1?
 <ol>
 <li> 0.3 </li>
-<li> 0.4 </li>
+<li class="answer"> 0.4 </li>
 <li> 0.5 </li>
 <li> 0.6 </li>
 <li> 0.7 </li>
@@ -84,7 +90,7 @@ $$
 2. Based on the preceding result, what is the probability that Machine 2 is "Good" given you won playing on Machine 1? 
 <ol>
 <li> 0.3 </li>
-<li> 0.4 </li>
+<li class="answer"> 0.4 </li>
 <li> 0.5 </li>
 <li> 0.6 </li>
 <li> 0.7 </li>
@@ -93,7 +99,7 @@ $$
 
 3. Under the Bayesian paradigm, which of the following correctly matches the probabilities with their names?
 <ol>
-<li> 
+<li class="answer"> 
   Posterior - $P(M_1 \text{ is Good} ~|~ \text{Win on } M_1)$ <br/> 
   Prior - $P(M_1 \text{ is Good})$ <br/>
   Likelihood - $P(\text{Win on } M_1 ~|~ M_1 \text{ is Good})$ 
@@ -145,18 +151,51 @@ Note that this exactly matches the probabilities we calculated when we provided 
 <ol>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.250$, $P(M_2\text{ is good}~|~\text{data}) = 0.750$ </li>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.429$, $P(M_2\text{ is good}~|~\text{data}) = 0.571$ </li>
-<li> $P(M_1\text{ is good}~|~\text{data}) = 0.571$, $P(M_2\text{ is good}~|~\text{data}) = 0.429$ </li>
+<li class="answer"> $P(M_1\text{ is good}~|~\text{data}) = 0.571$, $P(M_2\text{ is good}~|~\text{data}) = 0.429$ </li>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.750$, $P(M_2\text{ is good}~|~\text{data}) = 0.250$ </li>
 </ol>
 
+```{r q-five}
+
+data1 = data.frame(machine=c(1L), outcome=c("W"))
+data2 = data.frame(machine=c(1L), outcome=c("W"))
+data3 = data.frame(machine=c(2L), outcome=c("W"))
+data4 = data.frame(machine=c(2L), outcome=c("W"))
+data5 = data.frame(machine=c(2L), outcome=c("L"))
+prior2 <- bandit_posterior(data1) %>% bandit_posterior(data2, prior=.)
+prior3 <- bandit_posterior(data3, prior=prior2)
+prior4 <- bandit_posterior(data4, prior=prior3)
+bandit_posterior(data5, prior=prior4)
+```
+```{r concision-fives}
+data0 <- data.frame(machine=c(1,1,2,2,2), outcome=c("W","W","W","W","L"))
+bandit_posterior(data0)
+```
 
 5. What would the posterior probabilities be if we had instead played Machine 2 first, playing three times, winning twice and losing once and then playing Machine 1 twice and winning both times?
 <ol>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.250$, $P(M_2\text{ is good}~|~\text{data}) = 0.750$ </li>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.429$, $P(M_2\text{ is good}~|~\text{data}) = 0.571$ </li>
-<li> $P(M_1\text{ is good}~|~\text{data}) = 0.571$, $P(M_2\text{ is good}~|~\text{data}) = 0.429$ </li>
+<li class="answer"> $P(M_1\text{ is good}~|~\text{data}) = 0.571$, $P(M_2\text{ is good}~|~\text{data}) = 0.429$ </li>
 <li> $P(M_1\text{ is good}~|~\text{data}) = 0.750$, $P(M_2\text{ is good}~|~\text{data}) = 0.250$ </li>
 </ol>
+
+```{r q-six}
+data1 = data.frame(machine=c(2L), outcome=c("W"))
+data2 = data.frame(machine=c(2L), outcome=c("W"))
+data3 = data.frame(machine=c(2L), outcome=c("L"))
+data4 = data.frame(machine=c(1L), outcome=c("W"))
+data5 = data.frame(machine=c(1L), outcome=c("W"))
+
+prior2 <- bandit_posterior(data1) %>% bandit_posterior(data2, prior=.)
+prior3 <- bandit_posterior(data3, prior=prior2)
+prior4 <- bandit_posterior(data4, prior=prior3)
+bandit_posterior(data5, prior=prior4)
+```
+```{r consision-six}
+dataA <- data.frame(machine=c(2,2,2,1,1), outcome=c("W","W","L","W","W"))
+bandit_posterior(dataA)
+```
 
 
 <div id="exercise">
@@ -172,6 +211,10 @@ You may have notice that if you click on the Data tab in the middle of the App a
 <div id="exercise">
 Use this data frame with the `bandit_posterior` function to calculate the exact posterior probability of each machine being "good". Do these probabilities match with your intuition about which machine was good? 
 </div>
+```{r exercise-code}
+# my code for this exercise:
+bandit_posterior(data = data.frame(machine = c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L), outcome = c("W", "L", "W", "L", "L", "L", "L", "W", "L", "W", "L", "W", "W", "L", "L", "L", "W", "W", "L", "L", "L", "L", "L", "L", "L", "W", "L", "W", "L", "W", "W", "W", "L", "W", "L", "L", "L", "L", "W", "L", "W", "L", "L", "L", "W", "W", "L", "W", "L", "L", "L", "W", "W", "L", "L", "W", "L", "L", "L", "W")))
+```
 
 <div id="exercise">
 Reset the simulation and then play at least 50 times. Use subsetting (e.g. `data[1:10,]` for the first 10 plays) to calculate the posterior probability at every 10th play and observe how it changes as more plays are made.
@@ -195,12 +238,17 @@ plot_bandit_posterior(data)
 Plot the result of your last 50 plays, describe the pattern you see for the two posterior probabilities.
 </div>
 
+```{r hikeeba}
+mydata = data.frame(machine = c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L), outcome = c("W", "W", "L", "L", "L", "L", "L", "W", "L", "L", "W", "L", "W", "L", "L", "L", "W", "L", "W", "W", "W", "W", "W", "W", "L", "L", "W", "W", "W", "L", "W", "L", "W", "L", "L", "W", "W", "L", "L", "W", "W", "L", "L", "L", "L", "L", "W", "L", "L", "L"))
+plot_bandit_posterior(mydata)
+```
+
 
 1. Why do the posterior probabilities for Machine 1 and Machine 2 mirror each other?
 <ol>
 <li> $P(M_1~|~\text{data})$ and $P(M_2~|~\text{data})$ are complementary </li>
 <li> Machine 1 and Machine 2 being "good" are mutually exclusive events </li>
-<li> All of the above </li>
+<li class="answer"> All of the above </li>
 </ol>
 
 
