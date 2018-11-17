@@ -1,0 +1,42 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 Courier-Bold;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red13\green95\blue24;\red242\green242\blue242;\red38\green38\blue38;
+\red124\green19\blue2;\red50\green91\blue142;\red53\green145\blue93;}
+\margl1440\margr1440\vieww11100\viewh8700\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 samp %>% summarise(xbar = mean(area), sample_med = median(area), \
+            sigma = sd(area), sample_iqr = IQR(area),\
+            samp_min = min(area), samp_max = max(area),\
+            samp_q1 = quantile(area, 0.25),  # first quartile, 25th percentile\
+            samp_q3 = quantile(area, 0.75))  # third quartile, 75th percentile\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+summarise
+\f2\b0 \cf4 (\cf5 lower =\cf4  
+\f1\b \cf2 mean
+\f2\b0 \cf4 (area) -\cf6  
+\f1\b \cf2 qnorm
+\f2\b0 \cf4 (\cf7 \cb3 0.975\cf4 \cb3 ) *\cf6  \cf4 (
+\f1\b \cf2 sd
+\f2\b0 \cf4 (area) /\cf6  
+\f1\b \cf2 sqrt
+\f2\b0 \cf4 (n)),\
+            \cf5 upper =\cf4  
+\f1\b \cf2 mean
+\f2\b0 \cf4 (area) +\cf6  
+\f1\b \cf2 qnorm
+\f2\b0 \cf4 (\cf7 \cb3 0.975\cf4 \cb3 ) *\cf6  \cf4 (
+\f1\b \cf2 sd
+\f2\b0 \cf4 (area) /\cf6  
+\f1\b \cf2 sqrt
+\f2\b0 \cf4 (n)))\
+\
+critical values are here:\
+\
+http://www.dummies.com/education/math/statistics/checking-out-statistical-confidence-interval-critical-values/}
