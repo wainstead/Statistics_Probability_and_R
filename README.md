@@ -1,7 +1,7 @@
 # Programming in R, statistics, and probability
 
 The files in this repository are from the coursework for Duke
-Univerisity's classes in R programming, statistics, and probability.
+University's classes in R programming, statistics, and probability.
 
 The complete work of the first three courses is here.
 
